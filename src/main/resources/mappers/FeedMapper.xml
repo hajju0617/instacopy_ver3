@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.green.greengram.feed.FeedMapper">        <!-- user 인터페이스 주소명.인터페이스 파일명 -->
+    <insert id="postFeed"
+            keyProperty="feedId"
+            useGeneratedKeys="true">
+        INSERT INTO feed
+        SET writer_id = #{userId}
+        , contents = #{contents}
+        , location = #{location}
+    </insert>
+
+    <insert id="postFeedPics">
+        INSERT INTO feed_pics
+        ( feed_id, pic )
+        VALUES
+        <foreach item="item" collection="fileNames" separator=",">
+            ( #{feedId}, #{item} )
+            <!-- 컬렉션 리스트 한칸 한칸이 item, 즉 인덱스 1개 값이 item, 사진 이름 문자열이 인덱스 1칸씩 저장 -->
+        </foreach>
+    </insert>
+
+</mapper>
+
