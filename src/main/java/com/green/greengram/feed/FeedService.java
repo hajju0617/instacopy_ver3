@@ -1,9 +1,9 @@
 package com.green.greengram.feed;
 
 import com.green.greengram.common.CustomFileUtils;
-import com.green.greengram.feed.model.FeedPicPostDto;
-import com.green.greengram.feed.model.FeedPostReq;
-import com.green.greengram.feed.model.FeedPostRes;
+import com.green.greengram.common.GlobalConst;
+import com.green.greengram.feed.model.*;
+import com.green.greengram.feedcomment.model.FeedCommentGetRes;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,5 +49,24 @@ public class FeedService {
                 .feedId(p.getFeedId())
                 .pics(picDto.getFileNames())
                 .build();
+    }
+
+    public List<FeedGetRes> getFeed(FeedGetReq p) {
+        List<FeedGetRes> list = mapper.getFeed(p);
+        log.info("list : {}", list);
+
+        for(FeedGetRes res : list) {
+            List<String> pics = mapper.getFeedPicsByFeedId(res.getFeedId());    // 이 부분이 n을 뜻함
+            res.setPics(pics);
+
+            List<FeedCommentGetRes> comments = mapper.getFeedCommentTopBy4ByFeedId(res.getFeedId());
+            if(comments.size() == GlobalConst.COMMENT_SIZE_PER_FEED) {
+                res.setIsMoreComment(1);
+                comments.remove(comments.size() - 1);
+            }
+            res.setComments(comments);
+        }
+        log.info("list : {}", list);
+        return list;
     }
 }

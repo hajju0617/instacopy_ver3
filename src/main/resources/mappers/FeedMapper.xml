@@ -18,9 +18,39 @@
         VALUES
         <foreach item="item" collection="fileNames" separator=",">
             ( #{feedId}, #{item} )
-            <!-- 컬렉션 리스트 한칸 한칸이 item, 즉 인덱스 1개 값이 item, 사진 이름 문자열이 인덱스 1칸씩 저장 -->
         </foreach>
     </insert>
+
+    <select id="getFeed">
+        SELECT A.feed_id AS feedId, A.contents, A.location, A.created_at AS createdAt
+        , B.user_id AS writerId, B.nm AS writerNm, B.pic AS writerPic
+        , IF(C.feed_id IS NULL, 0, 1) AS isFav
+        FROM feed A
+        JOIN user B
+        ON A.writer_id = B.user_id
+        LEFT JOIN feed_favorite C         <!-- inner join => 교집합 / outer join => 합집합 / left join => A - B 차집합 + 교집합 / right join => B - A 차집합 + 교집합 -->
+        ON A.feed_id = C.feed_id
+        AND C.user_id = #{signedUserId}
+        ORDER BY A.feed_id DESC
+        LIMIT #{startIdx}, #{size};
+    </select>
+
+
+    <select id="getFeedPicsByFeedId">
+        SELECT pic
+        FROM feed_pics
+        WHERE feed_id = #{feedId}
+    </select>
+
+    <select id="getFeedCommentTopBy4ByFeedId">
+        SELECT A.feed_comment_id AS feedCommentId, A.comment, A.created_at AS createdAt
+        , B.user_id AS writerId, B.nm AS writerNm, B.pic AS writerPic
+        FROM feed_comment A
+        INNER JOIN user B
+        ON A.user_id = B.user_id
+        WHERE A.feed_id = #{feedId}
+        LIMIT 4
+    </select>
 
 </mapper>
 
