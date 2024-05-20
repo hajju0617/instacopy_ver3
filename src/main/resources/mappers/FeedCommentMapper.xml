@@ -25,6 +25,7 @@
         ON A.user_id = B.user_id
         WHERE A.feed_id = #{feedId}
         LIMIT 3, 999999
+
     </select>
 
 </mapper>

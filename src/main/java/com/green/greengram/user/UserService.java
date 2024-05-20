@@ -79,4 +79,8 @@ public class UserService {
         p.setUserId(user.getUserId());
         return mapper.patchPassword(p);
     }
+
+    public UserInfoGetRes getUserInfo(UserInfoGetReq p) {
+        return mapper.selProfileUserInfo(p);
+    }
 }

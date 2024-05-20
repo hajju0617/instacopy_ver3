@@ -1,8 +1,6 @@
 package com.green.greengram.user;
 
-import com.green.greengram.user.model.PatchPasswordReq;
-import com.green.greengram.user.model.SignUpPostReq;
-import com.green.greengram.user.model.User;
+import com.green.greengram.user.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -12,5 +10,7 @@ public interface UserMapper {
     User getUserById(String p);
 
     int patchPassword(PatchPasswordReq p);
+
+    UserInfoGetRes selProfileUserInfo(UserInfoGetReq p);
 
 }
