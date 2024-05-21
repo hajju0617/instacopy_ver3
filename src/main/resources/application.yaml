@@ -8,7 +8,10 @@ spring:
     password: green502
   servlet:
     multipart:
-      max-file-size: 25MB
+      max-file-size: 30MB
+      max-request-size: 50MB
+
+
 
 mybatis:
   mapper-locations: mappers/**/*.xml     # resources 아래에 xml 담긴 (mappers) 폴더이름
