@@ -34,6 +34,7 @@ public class CustomFileUtils {
         int idx = fileName.lastIndexOf(".");
         return fileName.substring(idx);
     }   // 파일명에서 확장자 추출
+    // 이 코드는 fileName 에서 마지막 점(.)의 위치를 찾고 그 위치부터 문자열의 끝까지를 반환합니다. 이는 파일의 확장자를 추출하는 데 유용
 
     public String makeRandomFileName(String fileName) {
         return makeRandomFileName() + getExt(fileName);
