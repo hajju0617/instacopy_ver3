@@ -83,4 +83,27 @@ public class UserService {
     public UserInfoGetRes getUserInfo(UserInfoGetReq p) {
         return mapper.selProfileUserInfo(p);
     }
+
+    @Transactional
+    public String patchProfilePic(UserProfilePatchReq p) {  // 기존  폴더 삭제
+        String fileNm = customFileUnits.makeRandomFileName(p.getPic()); // 랜덤 파일명 얻어와서 fileNm에 저장
+        p.setPicName(fileNm);
+        mapper.updProfilePic(p);
+
+        try {
+//        String folderPath = customFileUnits.uploadPath + "/user/" + p.getSignedUserId();
+        String folderPath = String.format("%s/user/%d", customFileUnits.uploadPath, p.getSignedUserId());
+        // + 기호를 쓰기 싫다면 이렇게 수정
+        customFileUnits.deleteFolder(folderPath);
+
+        customFileUnits.makeFolders(folderPath);
+        String filePath = String.format("%s/%s", folderPath, fileNm);
+
+        customFileUnits.transferTo(p.getPic(), filePath);   // public void transferTo(MultipartFile mf, String target) throws Exception
+                                                            // 예외를 던지고 있으므로 예외처리를 해줘야 레드라인이 생기지 않는다.
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return fileNm;
+    }
 }

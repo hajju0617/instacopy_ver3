@@ -13,7 +13,7 @@ import java.util.UUID;
 public class CustomFileUtils {
     @Value("${file.directory}")
 
-    private String uploadPath;
+    public final String uploadPath;
     public CustomFileUtils(@Value("${file.directory}") String uploadPath) {
         this.uploadPath = uploadPath;
     }
@@ -46,6 +46,25 @@ public class CustomFileUtils {
 
     public void transferTo(MultipartFile mf, String target) throws Exception {
         File savefile = new File(uploadPath, target);
-        mf.transferTo(savefile);
+        mf.transferTo(savefile);        // throws Exception 을 지우면 transferTo 레드라인
     }   // 파일 저장
+
+
+    public void deleteFolder(String absoluteFolderPath) {       // absoluteFolderPath : 절대 주소
+        File folder = new File(absoluteFolderPath); // Ex)D:\2024-1\download\greengram_ver3/user/pk값
+
+        if(folder.exists() && folder.isDirectory()) {   // exists() : 폴더나 디렉토리가 존재한다면 true, 존재하지 않는다면 false 를 반환
+                                                        // isDirectory() : 폴더 였다면 true, 파일이였다면 false
+            File[] files = folder.listFiles();  // listFiles() : 파일객체로 객체화 해서 배열 형태로 리턴해줌 (여러개일 수 있으므로)
+
+            for(File f : files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f.getAbsolutePath());  // 재귀호출 --> public void deleteFolder(String absoluteFolderPath) 호출
+                } else {
+                    f.delete();
+                }
+            }
+            folder.delete();
+        }
+    }   // 폴더 삭제 (이 메소드는 재귀 호출을 통해 주어진 폴더와 그 하위의 모든 폴더 및 파일을 삭제 함)
 }
