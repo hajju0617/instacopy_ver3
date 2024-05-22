@@ -14,12 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class UserService {
     private final UserMapper mapper;
-    private final CustomFileUtils customFileUnits;
+    private final CustomFileUtils customFileUtils;
 
     @Transactional
     public int postSignUp(MultipartFile pic, SignUpPostReq p) {
         log.info("pic : {}",pic);
-        String saveFileName = customFileUnits.makeRandomFileName(pic);
+        String saveFileName = customFileUtils.makeRandomFileName(pic);
         log.info("saveFileName : {}",saveFileName);
         p.setPic(saveFileName);
         String hashedPw = BCrypt.hashpw(p.getUpw(), BCrypt.gensalt());
@@ -32,11 +32,11 @@ public class UserService {
         }
         try {
             String path = String.format("user/%d", p.getUserId());
-            customFileUnits.makeFolders(path);
+            customFileUtils.makeFolders(path);
             log.info("path : {}", path);
 
             String target = String.format("%s/%s", path, saveFileName);
-            customFileUnits.transferTo(pic, target);
+            customFileUtils.transferTo(pic, target);
             log.info("target : {}",target);
 
         } catch (Exception e) {
@@ -86,21 +86,23 @@ public class UserService {
 
     @Transactional
     public String patchProfilePic(UserProfilePatchReq p) {  // 기존  폴더 삭제
-        String fileNm = customFileUnits.makeRandomFileName(p.getPic()); // 랜덤 파일명 얻어와서 fileNm에 저장
+        String fileNm = customFileUtils.makeRandomFileName(p.getPic()); // 랜덤 파일명 얻어와서 fileNm에 저장
         p.setPicName(fileNm);
         mapper.updProfilePic(p);
 
         try {
-//        String folderPath = customFileUnits.uploadPath + "/user/" + p.getSignedUserId();
-        String folderPath = String.format("%s/user/%d", customFileUnits.uploadPath, p.getSignedUserId());
-        // + 기호를 쓰기 싫다면 이렇게 수정
-        customFileUnits.deleteFolder(folderPath);
+            String midPath = String.format("user/%d", p.getSignedUserId());
+//    //        String folderPath = customFileUnits.uploadPath + "/user/" + p.getSignedUserId();
+//            String folderPath = String.format("%s/user/%d", customFileUtils.uploadPath, p.getSignedUserId());
+//            // + 기호를 쓰기 싫다면 이렇게 수정
+            String delAbsoluteFolderPath = String.format("%s%s", customFileUtils.uploadPath, midPath);
+            customFileUtils.deleteFolder(delAbsoluteFolderPath);
 
-        customFileUnits.makeFolders(folderPath);
-        String filePath = String.format("%s/%s", folderPath, fileNm);
+            customFileUtils.makeFolders(midPath);
+            String filePath = String.format("%s/%s", midPath, fileNm);
 
-        customFileUnits.transferTo(p.getPic(), filePath);   // public void transferTo(MultipartFile mf, String target) throws Exception
-                                                            // 예외를 던지고 있으므로 예외처리를 해줘야 레드라인이 생기지 않는다.
+            customFileUtils.transferTo(p.getPic(), filePath);   // public void transferTo(MultipartFile mf, String target) throws Exception
+                                                                // 예외를 던지고 있으므로 예외처리를 해줘야 레드라인이 생기지 않는다.
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

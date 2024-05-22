@@ -13,7 +13,7 @@ public class SignUpPostReq {
     @Schema(example = "가나다", description = "이름", requiredMode = Schema.RequiredMode.REQUIRED)
     private String nm;
 
-    @JsonIgnore private String pic; // why?
+    @JsonIgnore private String pic; // MultipartFile pic 로 받음.
 
     @JsonIgnore private long userId;
 }
