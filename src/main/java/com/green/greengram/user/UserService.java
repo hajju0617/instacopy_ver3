@@ -90,6 +90,7 @@ public class UserService {
         p.setPicName(fileNm);
         mapper.updProfilePic(p);
 
+        // 기존 폴더 삭제
         try {
             String midPath = String.format("user/%d", p.getSignedUserId());
 //    //        String folderPath = customFileUnits.uploadPath + "/user/" + p.getSignedUserId();
